@@ -8,11 +8,16 @@
 extern crate num_derive;
 extern crate num_traits;
 
+#[macro_use]
+extern crate lazy_static;
+
 pub mod bindings;
 pub mod error;
 mod image;
 pub mod ops;
 mod utils;
+
+pub mod action;
 
 use error::Error;
 use std::ffi::*;

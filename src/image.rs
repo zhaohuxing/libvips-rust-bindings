@@ -433,6 +433,28 @@ impl VipsImage {
         }
     }
 
+    pub fn image_write_to_magicksave_buffer(&self) -> Result<Vec<u8>> {
+        unsafe {
+            let mut buffer_buf_size: u64 = 0;
+            let mut buffer_out: *mut c_void = null_mut();
+            let k_c_str = utils::new_c_string("format")?;
+            let v_c_str = utils::new_c_string("GIF")?;
+            let res = bindings::vips_magicksave_buffer(
+                self.ctx,
+                &mut buffer_out,
+                &mut buffer_buf_size,
+                k_c_str.as_ptr(),
+                v_c_str.as_ptr(),
+                NULL,
+            ); 
+            utils::result(
+                res,
+                utils::new_byte_array(buffer_out, buffer_buf_size),
+                Error::IOError("Cannot write content to magicksave buffer"),
+            )
+        }    
+    }
+
     pub fn image_write_to_buffer(&self, suffix: &str) -> Result<Vec<u8>> {
         unsafe {
             let mut buffer_buf_size: u64 = 0;

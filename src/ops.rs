@@ -21082,3 +21082,101 @@ pub fn globalbalance_with_opts(
         )
     }
 }
+
+//pub fn image_get_string(input: &VipsImage, name: &str) -> Result<String> {
+pub fn image_get_string(_input: &VipsImage, _name: &str) -> String {
+   //unsafe {
+       //Ok(String::from(""))
+        //let input_in: *mut bindings::VipsImage = input.ctx;
+        //let name_in: CString = utils::new_c_string(name)?;
+        //let mut out: *const   
+    String::from("")
+   //}  
+}
+
+pub fn thumbnail_buffer_with_opts1(
+    buffer: &[u8],
+    width: i32,
+    height: i32,
+    _type: &str,
+) -> Result<VipsImage> {
+    unsafe {
+        let buffer_in: *mut c_void = buffer.as_ptr() as *mut c_void;
+        let width_in: i32 = width;
+        let mut out_out: *mut bindings::VipsImage = null_mut();
+
+        let height_in_name = utils::new_c_string("height")?;
+        let height_in: i32 = height;
+
+        let option_string_in_name = utils::new_c_string("option-string")?;
+        let option_string_in = utils::new_c_string("n=-1")?;
+
+        let vips_op_response;
+        if _type == "gif" || _type == "webp" {
+            if height == 0 {
+                vips_op_response = bindings::vips_thumbnail_buffer(
+                    buffer_in,
+                    buffer.len() as u64,
+                    &mut out_out,
+                    width_in,
+                    option_string_in_name.as_ptr(),
+                    option_string_in.as_ptr(),
+                    NULL,
+                );
+            } else {
+                vips_op_response = bindings::vips_thumbnail_buffer(
+                    buffer_in,
+                    buffer.len() as u64,
+                    &mut out_out,
+                    width_in,
+                    height_in_name.as_ptr(),
+                    height_in,
+                    option_string_in_name.as_ptr(),
+                    option_string_in.as_ptr(),
+                    NULL,
+                );
+            } 
+        } else {
+            if height == 0 {
+                vips_op_response = bindings::vips_thumbnail_buffer(
+                    buffer_in,
+                    buffer.len() as u64,
+                    &mut out_out,
+                    width_in,
+                    NULL,
+                );
+            } else {
+                vips_op_response = bindings::vips_thumbnail_buffer(
+                    buffer_in,
+                    buffer.len() as u64,
+                    &mut out_out,
+                    width_in,
+                    height_in_name.as_ptr(),
+                    height_in,
+                    NULL,
+                );
+            } 
+        }
+        utils::result(
+            vips_op_response,
+            VipsImage { ctx: out_out },
+            Error::ThumbnailBufferError,
+        )
+    }
+}
+
+pub fn text_with_opts1(text: &str, dpi: i32, color: &str) -> Result<VipsImage> {
+    unsafe {
+        let mut out_out: *mut bindings::VipsImage = null_mut();
+        let text = format!("<span foreground='{}'>{}</span>", color, text);
+        let text_in: CString = utils::new_c_string(&text)?;
+        let dpi_in_name = utils::new_c_string("spacing")?;
+
+        let vips_op_response = bindings::vips_text(&mut out_out, text_in.as_ptr(), dpi_in_name.as_ptr(), dpi, NULL);
+        utils::result(
+            vips_op_response,
+            VipsImage { ctx: out_out },
+            Error::TextError,
+        )
+    }
+}
